@@ -20,6 +20,18 @@ from sklearn.metrics import precision_recall_fscore_support
 from sklearn.gaussian_process import GaussianProcessClassifier
 
 def load_data(database_filepath):
+    """
+    Load data from an SQLite database and split it into features and labels.
+
+    Input:
+        database_filepath (str): The filepath to the SQLite database.
+
+    Returns:
+        X (pd.Series): The message column, containing the feature data.
+        Y (pd.DataFrame): The labels, containing categories from 'related' onward.
+        column_names (Index): The column names of the labels (categories).
+    """
+
     engine = create_engine('sqlite:///' + database_filepath)
     df = pd.read_sql_table('disaster_response', engine)
     df.dropna(inplace=True)
@@ -31,6 +43,16 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
+    """
+    Tokenize and process input text by removing non-alphanumeric characters,
+    converting to lowercase, removing stopwords, and lemmatizing words.
+
+    Input:
+        text (str): The text to be tokenized and processed.
+
+    Returns:
+        list: A list of processed words (tokens) from the input text.
+    """
     text_ = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
 
     words = word_tokenize(text_)
@@ -43,6 +65,21 @@ def tokenize(text):
 
 
 def build_model():
+    """
+    Build a machine learning pipeline for multi-output classification using a Random Forest classifier.
+
+    The pipeline consists of three steps:
+        1. Tokenization using the `tokenize` function with a `CountVectorizer`.
+        2. TF-IDF transformation using `TfidfTransformer`.
+        3. Multi-output classification using `RandomForestClassifier` wrapped in a `MultiOutputClassifier`.
+
+    A grid search is performed to tune the hyperparameters of the classifier, specifically the 
+    `max_depth` and `min_samples_leaf` parameters of the underlying RandomForestClassifier.
+
+    Returns:
+        GridSearchCV: A GridSearchCV object containing the model pipeline with hyperparameter tuning.
+    """
+
     clf = MultiOutputClassifier(RandomForestClassifier())
 
     pipeline = Pipeline([
@@ -63,6 +100,22 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    """
+    Evaluate a multi-output classification model on test data.
+
+    This function calculates and prints the aggregated F1 score, precision, and recall for each category.
+    It also returns a DataFrame with the precision, recall, and F1 score for each category.
+
+    Input:
+        model (sklearn.model_selection.GridSearchCV or sklearn.pipeline.Pipeline): The trained model to evaluate.
+        X_test (pd.Series): The input test features.
+        Y_test (pd.DataFrame): The true labels for the test data.
+        category_names (list): A list of category names corresponding to the labels in `Y_test`.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the precision, recall, and F1 score for each category.
+    """
+
     predicted = model.predict(X_test)
     results = pd.DataFrame(columns=['category', 'f1_score', 'precision', 'recall'])
 
@@ -78,6 +131,17 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    """
+    Save a trained model to a specified file.
+
+    Args:
+        model (sklearn.base.BaseEstimator): The trained model to save.
+        model_filepath (str): The path where the model will be saved, including the file name.
+
+    Returns:
+        None
+    """
+    
     pickle.dump(model, open(model_filepath, 'wb'))
 
 

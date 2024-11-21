@@ -4,6 +4,20 @@ import numpy as np
 from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
+    """
+    Load and merge messages and categories datasets.
+
+    Reads two CSV files, merges them on 'id', splits the 'categories' column into individual category columns, 
+    cleans up category names, and returns the resulting dataframe.
+
+    Input:
+        messages_filepath (str): Path to the messages CSV file.
+        categories_filepath (str): Path to the categories CSV file.
+
+    Returns:
+        pd.DataFrame: Merged dataframe with messages and cleaned category columns.
+    """
+
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
     df = pd.merge(messages, categories, on='id', how='outer')
@@ -24,14 +38,35 @@ def load_data(messages_filepath, categories_filepath):
 
 
 def clean_data(df):
+    """
+    Remove duplicate rows from a dataframe.
+
+    Input:
+        df (pd.DataFrame): The dataframe from which duplicates will be removed.
+
+    Returns:
+        pd.DataFrame: The dataframe with duplicate rows removed.
+    """
+     
     df = df.drop_duplicates()
 
     return df
 
 
 def save_data(df, database_filename):
+    """
+    Save the dataframe to an SQLite database.
+
+    Input:
+        df (pd.DataFrame): The dataframe to be saved.
+        database_filename (str): The filename of the SQLite database.
+
+    Returns:
+        None
+    """
+     
     engine = create_engine('sqlite:///' + database_filename)
-    df.to_sql('disaster_response', engine, index=False)  
+    df.to_sql('disaster_response', engine, index=False, if_exists='replace')  
 
 
 def main():

@@ -1,18 +1,15 @@
 # Disaster Response Machine Learning Pipeline Project
 
-This repo contains the implementation for ETL and ML pipeline where the input messages are classified into different categories to identify the disaster responses. There is also a GUI/Website written in Flask Web App.
+This project leverages data engineering and machine learning techniques to build a system that classifies disaster messages for efficient emergency response. Using real-world data from Appen, a machine learning pipeline is developed to categorize messages into various disaster-related categories. The project includes a web application where emergency workers can input new messages and receive classification results. It also incorporates visualizations to provide insights into the data. The project demonstrates proficiency in creating data pipelines, building machine learning models, and developing user-friendly web applications.
 
 ### Dependencies
 
 * python 3.11
 * numpy
-
 * sqlalchemy
 * re
-
 * pickle
 * nltk
-
 * scikit-learn
 
 ### Instructions
