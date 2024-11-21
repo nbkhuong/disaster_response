@@ -49,7 +49,7 @@ def clean_data(df):
     """
      
     df = df.drop_duplicates()
-    df = df[~df.isin([2]).any(axis=1)]
+    df.replace(2, 1, inplace=True)
 
     return df
 
